@@ -26,7 +26,7 @@ description: "Comet 预设路径：Bug fix / 热修复。跳过 brainstorming，
 COMET_ENV="${COMET_ENV:-$(find . "$HOME"/.*/skills "$HOME/.config" "$HOME/.gemini" -path '*/comet/scripts/comet-env.sh' -type f -print -quit 2>/dev/null)}"
 if [ -z "$COMET_ENV" ]; then
   echo "ERROR: comet-env.sh not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 . "$COMET_ENV"
 ```
@@ -166,6 +166,22 @@ Hotfix 流程为 **一次性连续执行**。调用 `/comet-hotfix` 后，agent 
 ```
 
 然后在当前 change 基础上补充 Design Doc：**立即使用 Skill 工具加载 `comet-design` skill**，后续正常走完整流程。若用户不确认升级，停止 hotfix 并报告当前变更已超出 hotfix 适用范围。
+
+---
+
+## 上下文压缩恢复
+
+Hotfix 流程可能触发上下文压缩。恢复时先运行：
+
+```bash
+"$COMET_BASH" "$COMET_STATE" check <change-name> open --recover
+```
+
+脚本输出结构化恢复上下文（phase、产物状态、恢复动作）。根据输出的 phase 路由到对应子 skill：
+- `phase: open` → `/comet-open`
+- `phase: build` → `/comet-build`
+- `phase: verify` → `/comet-verify`
+- `phase: archive` → `/comet-archive`
 
 ---
 

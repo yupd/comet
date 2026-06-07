@@ -56,13 +56,13 @@ openspec/changes/<name>/
 COMET_ENV="${COMET_ENV:-$(find . "$HOME"/.*/skills "$HOME/.config" "$HOME/.gemini" -path '*/comet/scripts/comet-env.sh' -type f -print -quit 2>/dev/null)}"
 if [ -z "$COMET_ENV" ]; then
   echo "ERROR: comet-env.sh not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 . "$COMET_ENV"
 
 if [ -z "$COMET_STATE" ] || [ -z "$COMET_GUARD" ]; then
   echo "ERROR: Comet scripts not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 
 "$COMET_BASH" "$COMET_STATE" init <name> full
@@ -105,6 +105,20 @@ AskUserQuestion 必须以单选题形式呈现，包含以下摘要和选项：
 - 「需要调整」— 附带调整说明，修改后重新请求确认
 
 用户选择「确认」后继续执行退出条件。用户选择「需要调整」时，按其说明修改对应文件，然后重新使用 AskUserQuestion 请求确认。
+
+## 上下文压缩恢复
+
+Open 阶段可能触发上下文压缩。恢复时先运行：
+
+```bash
+"$COMET_BASH" "$COMET_STATE" check <change-name> open --recover
+```
+
+脚本输出结构化恢复上下文（phase、产物文件状态、恢复动作），根据输出的 Recovery action 决定下一步。
+
+若三个产物（proposal.md、design.md、tasks.md）已存在且完整，直接进入 Step 5 用户审视确认；若产物不完整，从缺失步骤继续。
+
+---
 
 ## 退出条件
 

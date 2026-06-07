@@ -236,7 +236,7 @@ Comet scripts are distributed in `comet/scripts/`. **Do not hardcode paths** —
 COMET_ENV="${COMET_ENV:-$(find . "$HOME"/.*/skills "$HOME/.config" "$HOME/.gemini" -path '*/comet/scripts/comet-env.sh' -type f -print -quit 2>/dev/null)}"
 if [ -z "$COMET_ENV" ]; then
   echo "ERROR: comet-env.sh not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 . "$COMET_ENV"
 
@@ -244,7 +244,7 @@ fi
 if [ -z "$COMET_GUARD" ] || [ -z "$COMET_STATE" ] || [ -z "$COMET_HANDOFF" ] || [ -z "$COMET_ARCHIVE" ]; then
   echo "ERROR: Comet scripts not found. Ensure the comet skill is installed." >&2
   echo "Expected path pattern: */comet/scripts/comet-*.sh under project or platform skill directories" >&2
-  return 1
+  exit 1
 fi
 ```
 

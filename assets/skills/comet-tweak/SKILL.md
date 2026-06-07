@@ -29,7 +29,7 @@ Locate Comet scripts before starting:
 COMET_ENV="${COMET_ENV:-$(find . "$HOME"/.*/skills "$HOME/.config" "$HOME/.gemini" -path '*/comet/scripts/comet-env.sh' -type f -print -quit 2>/dev/null)}"
 if [ -z "$COMET_ENV" ]; then
   echo "ERROR: comet-env.sh not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 . "$COMET_ENV"
 ```
@@ -151,6 +151,22 @@ After user confirms upgrade, **must first update the workflow field** before ent
 ```
 
 Then on current change basis, supplement Design Doc: **Immediately use the Skill tool to load the `comet-design` skill**, proceed normally with full workflow. If user does not confirm upgrade, stop tweak and report that current change has exceeded tweak scope.
+
+---
+
+## Context Compression Recovery
+
+Tweak flow may trigger context compression. On recovery, run first:
+
+```bash
+"$COMET_BASH" "$COMET_STATE" check <change-name> open --recover
+```
+
+The script outputs structured recovery context (phase, artifact status, recovery action). Route to the corresponding sub-skill based on phase:
+- `phase: open` → `/comet-open`
+- `phase: build` → `/comet-build`
+- `phase: verify` → `/comet-verify`
+- `phase: archive` → `/comet-archive`
 
 ---
 

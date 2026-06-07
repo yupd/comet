@@ -56,13 +56,13 @@ Create `.comet.yaml` state file:
 COMET_ENV="${COMET_ENV:-$(find . "$HOME"/.*/skills "$HOME/.config" "$HOME/.gemini" -path '*/comet/scripts/comet-env.sh' -type f -print -quit 2>/dev/null)}"
 if [ -z "$COMET_ENV" ]; then
   echo "ERROR: comet-env.sh not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 . "$COMET_ENV"
 
 if [ -z "$COMET_STATE" ] || [ -z "$COMET_GUARD" ]; then
   echo "ERROR: Comet scripts not found. Ensure the comet skill is installed." >&2
-  return 1
+  exit 1
 fi
 
 "$COMET_BASH" "$COMET_STATE" init <name> full
@@ -105,6 +105,20 @@ AskUserQuestion must be presented as a single-select question with the following
 - "Needs adjustment" — include adjustment notes, modify and re-request confirmation
 
 After user selects "Confirm", proceed to exit conditions. When user selects "Needs adjustment", modify the corresponding files per their notes, then re-use AskUserQuestion to request confirmation.
+
+## Context Compression Recovery
+
+Open phase may trigger context compression. On recovery, run first:
+
+```bash
+"$COMET_BASH" "$COMET_STATE" check <change-name> open --recover
+```
+
+The script outputs structured recovery context (phase, artifact file status, recovery action). Determine next step based on the Recovery action output.
+
+If the three artifacts (proposal.md, design.md, tasks.md) already exist and are complete, proceed directly to Step 5 user review; if artifacts are incomplete, continue from the first missing step.
+
+---
 
 ## Exit Conditions
 
